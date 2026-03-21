@@ -1,7 +1,35 @@
 [project]
 name = "week03-homework-2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Week 3 Homework: Milvus FAQ and Graph RAG Systems"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    # Core LlamaIndex
+    "llama-index>=0.10.0",
+    "llama-index-core>=0.10.0",
+
+    # Vector Database - Milvus
+    "llama-index-vector-stores-milvus>=0.1.0",
+    "pymilvus>=2.3.0",
+
+    # Graph Database - Neo4j
+    "llama-index-graph-stores-neo4j>=0.2.0",
+    "neo4j>=5.14.0",
+
+    # LLM Integration
+    "llama-index-llms-openai>=0.1.0",
+    "openai>=1.0.0",
+
+    # Embeddings
+    "llama-index-embeddings-openai>=0.1.0",
+
+    # FastAPI for REST API
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
