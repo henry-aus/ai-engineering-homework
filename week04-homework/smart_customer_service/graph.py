@@ -10,7 +10,6 @@ from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 
 from .config import Config
-from .tools import TOOLS, query_order, process_refund, issue_invoice
 
 
 # State schema
@@ -28,11 +27,19 @@ class ConversationState(TypedDict):
 def get_llm():
     """Get configured LLM instance."""
     Config.validate()
-    return ChatOpenAI(
-        model=Config.OPENAI_MODEL,
-        api_key=Config.OPENAI_API_KEY,
-        temperature=0,
-    )
+
+    # Try to use hot reload manager if available
+    try:
+        from .hot_reload import get_hot_reload_manager
+        manager = get_hot_reload_manager()
+        return manager.get_llm()
+    except ImportError:
+        # Fallback to direct instantiation if hot reload not available
+        return ChatOpenAI(
+            model=Config.OPENAI_MODEL,
+            api_key=Config.OPENAI_API_KEY,
+            temperature=0,
+        )
 
 
 # Node: Extract intent and parameters
@@ -173,15 +180,53 @@ def call_tool(state: ConversationState) -> ConversationState:
     parameters = state.get("parameters", {})
 
     try:
+        # Get fresh tools from hot reload manager
+        try:
+            from .hot_reload import get_hot_reload_manager
+            manager = get_hot_reload_manager()
+            tools = manager.get_plugins()
+        except ImportError:
+            # Fallback to direct import if hot reload not available
+            from .tools import TOOLS
+            tools = TOOLS
+
+        # Map intent to tool name
+        tool_mapping = {
+            "order_query": "query_order",
+            "refund_request": "process_refund",
+            "invoice_request": "issue_invoice",
+        }
+
+        tool_name = tool_mapping.get(intent)
+        if not tool_name:
+            return {
+                **state,
+                "tool_result": {"error": "Unknown intent"},
+            }
+
+        # Find the tool by name
+        tool = None
+        for t in tools:
+            if t.name == tool_name:
+                tool = t
+                break
+
+        if not tool:
+            return {
+                **state,
+                "tool_result": {"error": f"Tool '{tool_name}' not found"},
+            }
+
+        # Invoke the tool with appropriate parameters
         if intent == "order_query":
-            result = query_order.invoke({"order_id": parameters.get("order_id")})
+            result = tool.invoke({"order_id": parameters.get("order_id")})
         elif intent == "refund_request":
-            result = process_refund.invoke({
+            result = tool.invoke({
                 "order_id": parameters.get("order_id"),
                 "reason": parameters.get("reason", "")
             })
         elif intent == "invoice_request":
-            result = issue_invoice.invoke({
+            result = tool.invoke({
                 "order_id": parameters.get("order_id"),
                 "invoice_type": parameters.get("invoice_type", "个人"),
                 "invoice_title": parameters.get("invoice_title", "")
