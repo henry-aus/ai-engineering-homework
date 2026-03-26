@@ -6,5 +6,22 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
 	"python-dotenv",
-	# add your dependencies here and run `uv sync` to install them
+	# LangChain and LangGraph for conversation system
+	"langchain>=0.1.0",
+	"langchain-core>=0.1.0",
+	"langchain-openai>=0.0.5",
+	"langgraph>=0.0.20",
+	# Web framework for API and health check
+	"fastapi>=0.109.0",
+	"uvicorn[standard]>=0.27.0",
+	# Testing framework
+	"pytest>=8.0.0",
+	"pytest-asyncio>=0.23.0",
+	"httpx>=0.26.0",
+	# Utilities
+	"pydantic>=2.5.0",
+	"pydantic-settings>=2.1.0",
+	"python-dateutil>=2.8.0",
+	# Hot reload support
+	"watchdog>=4.0.0",
 ]
