@@ -1,10 +1,30 @@
 [project]
 name = "week05-homework"
 version = "0.1.0"
-description = "Add your description here"
+description = "Multi-agent article writing system with MCP and LangGraph"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-	"python-dotenv",
-	# add your dependencies here and run `uv sync` to install them
+	"python-dotenv>=1.0.0",
+
+	# LangChain/LangGraph ecosystem
+	"langchain>=0.2.16",
+	"langchain-core>=0.2.38",
+	"langchain-anthropic>=0.1.23",
+	"langgraph>=0.2.28",
+
+	# Search API
+	"tavily-python>=0.5.0",
+
+	# Terminal UI
+	"rich>=13.8.0",
+
+	# Utilities
+	"pydantic>=2.9.0",
+	"pydantic-settings>=2.5.2",
+	"requests>=2.32.0",
+	"beautifulsoup4>=4.12.0",
+
+	# Async support
+	"aiohttp>=3.10.0",
 ]
